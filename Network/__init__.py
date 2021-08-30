@@ -1,4 +1,4 @@
-import socket, threading, os, sys, time, requests, urllib, string
+import socket, threading, os, sys, time, requests, urllib, string, platform, itertools
 from json import dumps, loads
 from random import choice, shuffle
 from time import sleep
@@ -6,6 +6,18 @@ from .colors import *
 
 SCREEN_SIZE = (77, 7)
 W, H = SCREEN_SIZE
+ART = """
+ /$$$$$$$$                     /$$       /$$       /$$           /$$
+|_____ $$                     | $$      | $$      |__/          | $$
+     /$$/   /$$$$$$   /$$$$$$ | $$$$$$$ | $$   /$$ /$$  /$$$$$$ | $$
+    /$$/   |____  $$ /$$__  $$| $$__  $$| $$  /$$/| $$ /$$__  $$| $$
+   /$$/     /$$$$$$$| $$  \ $$| $$  \ $$| $$$$$$/ | $$| $$$$$$$$| $$
+  /$$/     /$$__  $$| $$  | $$| $$  | $$| $$_  $$ | $$| $$_____/| $$
+ /$$$$$$$$|  $$$$$$$| $$$$$$$/| $$  | $$| $$ \  $$| $$|  $$$$$$$| $$
+|________/ \_______/| $$____/ |__/  |__/|__/  \__/|__/ \_______/|__/
+                    | $$                                            
+                    | $$                                            
+                    |__/            """
 
 def check_internet(site="http://www.image.google.com") -> bool:
     try:
@@ -37,6 +49,21 @@ def colorize(color, text, reset="\033[0;0m") -> None:
     sys.stdout.write(color)
     print(text)
     sys.stdout.write(reset)
+
+
+def animate(animationList, finished, FinishedMessage='''Done!
+                                                            ''', text='', delay=1):
+    for char in itertools.cycle(animationList):
+        if finished:
+            break
+        else:
+            sleep(int(delay))
+            sys.stdout.write('\r{}{}'.format(text, char))
+            sys.stdout.flush()
+    if FinishedMessage:
+        sys.stdout.write(f'{FinishedMessage}')
+        sys.stdout.flush()
+
     
 class ClientNetwork:
     def __init__(self, ip=None, port=None) -> None:
@@ -48,12 +75,10 @@ class ClientNetwork:
         self.disc = '{:}{DISC><CON>?'
 
     def MainScreen(self) -> None:
-        os.system('cls')
-
-        for i in range(88):
-            sleep(0.3)
-            shuffle(intense_colors)
-            colorize(choice(intense_colors), '{} {} {} {} {}'.format(i, i, i, i, i))
+        if platform.system() == 'Windows':
+            os.system('cls')
+        else:
+            os.system('clear')
         
 
     def initialize(self) -> tuple:
