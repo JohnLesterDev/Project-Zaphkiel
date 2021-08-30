@@ -1,7 +1,11 @@
 import socket, threading, os, sys, time, requests, urllib, string
 from json import dumps, loads
+from random import choice, shuffle
+from time import sleep
+from .colors import *
 
-
+SCREEN_SIZE = (77, 7)
+W, H = SCREEN_SIZE
 
 def check_internet(site="http://www.image.google.com") -> bool:
     try:
@@ -16,20 +20,41 @@ def public_ip() -> str:
     if int_access:
         ip = urllib.request.urlopen("https://api.ipify.org/").read()
         ip = str(ip)
-        ip = ip.strip('{}{}'.format("'", string.ascii_letters))
+        ip = ip.strip("{}{}".format("'", string.ascii_letters))
         return ip
     else:
         return "No Internet Access!"
 
+
+def colorize(color, text, reset="\033[0;0m") -> None:
+    color = list(color)
+    color.pop(0)
+    color.pop(0)
+    color.pop(-1)
+    color.pop(-1)
+    color = ''.join(color)
+    sys.stdout.write(reset)
+    sys.stdout.write(color)
+    print(text)
+    sys.stdout.write(reset)
     
 class ClientNetwork:
-    def __init__(self, ip, port):
+    def __init__(self, ip=None, port=None) -> None:
         self.ip = ip
         self.port = port
         self.addr = (self.ip, self.port)
         self.buff = 2048
         self.format = 'utf-8'
         self.disc = '{:}{DISC><CON>?'
+
+    def MainScreen(self) -> None:
+        os.system('cls')
+
+        for i in range(88):
+            sleep(0.3)
+            shuffle(intense_colors)
+            colorize(choice(intense_colors), '{} {} {} {} {}'.format(i, i, i, i, i))
+        
 
     def initialize(self) -> tuple:
         try:
@@ -39,9 +64,11 @@ class ClientNetwork:
                 os.makedirs('Zaphkiel Core')
             except FileExistsError:
                 pass
+            init_dict = {}
+            
             init_file = open('Zaphkiel Core\\initialize.json','w')
      
-    def create(self):
+    def create(self) -> None:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(self.addr)
 
