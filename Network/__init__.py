@@ -10,6 +10,7 @@ def check_internet(site="http://www.image.google.com") -> bool:
     except (requests.ConnectionError, requests.Timeout) as exception:
         return False
 
+
 def public_ip() -> str:
     int_access = check_internet()
     if int_access:
@@ -19,8 +20,8 @@ def public_ip() -> str:
         return ip
     else:
         return "No Internet Access!"
-    
 
+    
 class ClientNetwork:
     def __init__(self, ip, port):
         self.ip = ip
@@ -40,13 +41,11 @@ class ClientNetwork:
                 pass
             init_file = open('Zaphkiel Core\\initialize.json','w')
      
-
     def create(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(self.addr)
 
            
-
 class ServerNetwork:
     def __init__(self, port):
         self.ip = ''
