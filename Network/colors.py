@@ -1,3 +1,19 @@
+import sys
+
+
+def colorize(color, text, reset="\033[0;0m") -> None:
+    color = list(color)
+    color.pop(0)
+    color.pop(0)
+    color.pop(-1)
+    color.pop(-1)
+    color = ''.join(color)
+    sys.stdout.write(reset)
+    sys.stdout.write(color)
+    print(text)
+    sys.stdout.write(reset)
+
+
 # Normal
 Black="\[\033[0;30m\]"        # Black
 Red="\[\033[0;31m\]"          # Red
