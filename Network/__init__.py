@@ -1,23 +1,9 @@
-import socket, threading, os, sys, time, requests, urllib, string, platform, itertools
+import socket, threading, os, sys, datetime, requests, urllib, string, platform, itertools
 from json import dumps, loads
 from random import choice, shuffle
 from time import sleep
 from .colors import *
 
-SCREEN_SIZE = (77, 7)
-W, H = SCREEN_SIZE
-ART = """
- /$$$$$$$$                     /$$       /$$       /$$           /$$
-|_____ $$                     | $$      | $$      |__/          | $$
-     /$$/   /$$$$$$   /$$$$$$ | $$$$$$$ | $$   /$$ /$$  /$$$$$$ | $$
-    /$$/   |____  $$ /$$__  $$| $$__  $$| $$  /$$/| $$ /$$__  $$| $$
-   /$$/     /$$$$$$$| $$  \ $$| $$  \ $$| $$$$$$/ | $$| $$$$$$$$| $$
-  /$$/     /$$__  $$| $$  | $$| $$  | $$| $$_  $$ | $$| $$_____/| $$
- /$$$$$$$$|  $$$$$$$| $$$$$$$/| $$  | $$| $$ \  $$| $$|  $$$$$$$| $$
-|________/ \_______/| $$____/ |__/  |__/|__/  \__/|__/ \_______/|__/
-                    | $$                                            
-                    | $$                                            
-                    |__/            """
 
 def check_internet(site="http://www.image.google.com") -> bool:
     try:
@@ -38,64 +24,53 @@ def public_ip() -> str:
         return "No Internet Access!"
 
 
-def colorize(color, text, reset="\033[0;0m") -> None:
-    color = list(color)
-    color.pop(0)
-    color.pop(0)
-    color.pop(-1)
-    color.pop(-1)
-    color = ''.join(color)
-    sys.stdout.write(reset)
-    sys.stdout.write(color)
-    print(text)
-    sys.stdout.write(reset)
-
-
-def animate(animationList, finished, FinishedMessage='''Done!
-                                                            ''', text='', delay=1):
-    for char in itertools.cycle(animationList):
-        if finished:
-            break
-        else:
-            sleep(int(delay))
-            sys.stdout.write('\r{}{}'.format(text, char))
-            sys.stdout.flush()
-    if FinishedMessage:
-        sys.stdout.write(f'{FinishedMessage}')
-        sys.stdout.flush()
+def initialize(nickname, NewPrompt=None) -> str:
+    try:
+        os.makedirs('Zaphkiel Core')
+    except FileExistsError:
+        pass
+    nameList = []
+    ipList = []
+    try:
+        init_file = open('Zaphkiel Core\\configs.json', 'r').read()
+    except FileNotFoundError:
+        nickname = input(NewPrompt)
+        init_file = open('Zaphkiel Core\\configs.json', 'w')
+        init_dict = {}
+        
 
     
 class ClientNetwork:
-    def __init__(self, ip=None, port=None) -> None:
+    def __init__(self, nickname, ip=None, port=None) -> None:
+        self.nickname = nickname
         self.ip = ip
         self.port = port
+        self.date = datetime.datetime.now()
         self.addr = (self.ip, self.port)
         self.buff = 2048
         self.format = 'utf-8'
         self.disc = '{:}{DISC><CON>?'
 
-    def MainScreen(self) -> None:
-        if platform.system() == 'Windows':
-            os.system('cls')
-        else:
-            os.system('clear')
-        
-
-    def initialize(self) -> tuple:
-        try:
-            init_file = open('Zaphkiel Core\\initialize.json', 'r').read()
-        except FileNotFoundError:
-            try:
-                os.makedirs('Zaphkiel Core')
-            except FileExistsError:
-                pass
-            init_dict = {}
-            
-            init_file = open('Zaphkiel Core\\initialize.json','w')
      
     def create(self) -> None:
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.client.connect(self.addr)
+
+
+    def Send(self, message) -> None:
+        message_length = len(message)
+        message_length = str(message_length).encode(self.format)
+        message_length += b' ' * (self.buff - len(message_length))
+        message = str(message).encode(self.format)
+        self.client.send(message_length)
+        self.client.send(message)
+    
+    
+    def SendBytes(self, byteSource) -> None:
+        byte_source_length = len(byteSource)
+        byte_source_length += b' ' * (self.buff - byte_source_length)
+        self.client.send(byte_source_length)
+        self.client.send(byteSource)
 
            
 class ServerNetwork:
